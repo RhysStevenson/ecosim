@@ -2,6 +2,11 @@ import * as PIXI from 'pixi.js';
 import { Creature } from './creature.ts';
 import { Food } from './food.ts';
 
+type Effect = {
+  sprite: PIXI.Particle;
+  lifetime: number;
+};
+
 export class World {
   width: number;
   height: number;
@@ -15,6 +20,7 @@ export class World {
   foodContainer: PIXI.ParticleContainer;
   foodSpawnTimer: number = 0; // seconds accumulator
   foodSpawnInterval: number = 0.1; // spawn every 1 second (adjustable)
+  effects: Effect[] = [];
 
   constructor(stage: PIXI.Container, width: number, height: number) {
     this.width = width;
@@ -87,6 +93,18 @@ export class World {
     this._update_creatures(dt);
 
     this._spawn_food(dt);
+
+    // Update temporary pink pops
+    if (this.effects) {
+    for (let i = this.effects.length - 1; i >= 0; i--) {
+        const e = this.effects[i];
+        e.lifetime -= dt;
+        e.sprite.alpha = Math.max(e.lifetime / 0.3, 0);
+        if (e.lifetime <= 0) {
+        this.effects.splice(i, 1);
+        }
+    }
+    }
   }
 
   _update_creatures(dt: number) {

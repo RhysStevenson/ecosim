@@ -91,6 +91,21 @@ export class Creature {
       child.energy = this.energy;
       child.wanderAngle = offsetAngle; // give child a wander direction
       world.creatures.push(child);
+
+      // --- Visual flair: simple pink pop ---
+      const effect = new PIXI.Particle(PIXI.Texture.WHITE);
+      effect.scaleX = 5;
+      effect.scaleY = 5;
+      effect.tint = 0xff69b4; // pink
+      effect.anchorX = 0.5;
+      effect.anchorY = 0.5;
+      effect.x = this.x;
+      effect.y = this.y;
+      world.container.addParticle(effect);
+
+      // Store effect in world for lifetime management
+      if (!world.effects) world.effects = [];
+      world.effects.push({ sprite: effect, lifetime: 0.3 }); // 0.3s fade
     }
 
     // --- Move ---
@@ -105,12 +120,27 @@ export class Creature {
 
     // --- Energy drain & death ---
     this.energy -= dt * 5;
-    if (this.energy <= 0) this.dead = true;
+    if (this.energy <= 0) {
+      this.dead = true;
+
+      // --- Visual flair: simple grey pop ---
+      const effect = new PIXI.Particle(PIXI.Texture.WHITE);
+      effect.scaleX = 5;
+      effect.scaleY = 5;
+      effect.tint = 0x898989; // grey
+      effect.anchorX = 0.5;
+      effect.anchorY = 0.5;
+      effect.x = this.x;
+      effect.y = this.y;
+      world.container.addParticle(effect);
+
+      // Store effect in world for lifetime management
+      if (!world.effects) world.effects = [];
+      world.effects.push({ sprite: effect, lifetime: 0.3 }); // 0.3s fade
+    }
 
     // --- Update sprite ---
     this.sprite.x = this.x;
     this.sprite.y = this.y;
   }
-
-
 }

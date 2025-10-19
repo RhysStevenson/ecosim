@@ -18,6 +18,6 @@ const world = new World(app.stage, app.screen.width, app.screen.height);
 // Main loop
 app.ticker.add((ticker) => {
     const delta = ticker.deltaTime;
-    const dt = delta / 60;
+    const dt = delta / 30;
     world.update(dt);
 });

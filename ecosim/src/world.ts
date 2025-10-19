@@ -13,6 +13,8 @@ export class World {
   foods: Food[] = [];
   container: PIXI.ParticleContainer;
   foodContainer: PIXI.ParticleContainer;
+  foodSpawnTimer: number = 0; // seconds accumulator
+  foodSpawnInterval: number = 0.1; // spawn every 1 second (adjustable)
 
   constructor(stage: PIXI.Container, width: number, height: number) {
     this.width = width;
@@ -81,10 +83,39 @@ export class World {
 
   update(dt: number) {
     this.clearGrid();
+    console.log(this.creatures.length)
+    this._update_creatures(dt);
 
-    for (const c of this.creatures) {
-      c.update(dt, this.width, this.height, this.foods, this);
-      this.insertToGrid(c);
+    this._spawn_food(dt);
+  }
+
+  _update_creatures(dt: number) {
+    for (let i = this.creatures.length - 1; i >= 0; i--) {
+        const creature = this.creatures[i];
+        creature.update(dt, this.width, this.height, this.foods, this);
+        if (creature.dead) {
+            this.container.removeParticle(creature.sprite);
+            this.creatures.splice(i, 1);
+        } else {
+            this.insertToGrid(creature);
+        }
+    }
+  }
+
+  _spawn_food(dt: number) {
+    this.foodSpawnTimer += dt;
+    while (this.foodSpawnTimer >= this.foodSpawnInterval) {
+        this.foodSpawnTimer -= this.foodSpawnInterval;
+
+        // Spawn a new food at random position
+        if (this.foods.length < 5000) {
+            const f = new Food(
+                Math.random() * this.width,
+                Math.random() * this.height,
+                this.foodContainer
+            );
+            this.foods.push(f);
+        }
     }
   }
 }

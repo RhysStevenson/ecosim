@@ -1,6 +1,6 @@
-import * as PIXI from 'pixi.js';
-import { Creature } from './creature.ts';
-import { Food } from './food.ts';
+import * as PIXI from "pixi.js";
+import { Creature } from "./creature.ts";
+import { Food } from "./food.ts";
 
 type Effect = {
   sprite: PIXI.Particle;
@@ -32,17 +32,17 @@ export class World {
     this.cols = Math.ceil(width / this.cellSize);
     this.rows = Math.ceil(height / this.cellSize);
     this.grid = Array.from({ length: this.cols }, () =>
-      Array.from({ length: this.rows }, () => [])
+      Array.from({ length: this.rows }, () => []),
     );
 
     // particle container for fast sprite batching
     this.container = new PIXI.ParticleContainer({
-        dynamicProperties: {
-            position: true, // default
-            vertex: false,
-            rotation: false,
-            color: false,
-        },
+      dynamicProperties: {
+        position: true, // default
+        vertex: false,
+        rotation: false,
+        color: false,
+      },
     });
     stage.addChild(this.container);
 
@@ -51,35 +51,39 @@ export class World {
       const c = new Creature(
         Math.random() * width,
         Math.random() * height,
-        this.container
+        this.container,
       );
       this.creatures.push(c);
     }
 
     this.foodContainer = new PIXI.ParticleContainer({
-        dynamicProperties: {
-            position: true, // default
-            vertex: false,
-            rotation: false,
-            color: false,
-        },
+      dynamicProperties: {
+        position: true, // default
+        vertex: false,
+        rotation: false,
+        color: false,
+      },
     });
     stage.addChild(this.foodContainer);
 
     this.foods = [];
     // Spawn some food randomly
     for (let i = 0; i < 200; i++) {
-        const f = new Food(Math.random() * width, Math.random() * height, this.foodContainer);
-        this.foods.push(f);
+      const f = new Food(
+        Math.random() * width,
+        Math.random() * height,
+        this.foodContainer,
+      );
+      this.foods.push(f);
     }
 
     this.populationText = new PIXI.Text({
-        text: "Population: 0",
-        style: {
-            fill: 0xffffff,
-            fontSize: 14,
-            fontFamily: "monospace",
-        },
+      text: "Population: 0",
+      style: {
+        fill: 0xffffff,
+        fontSize: 14,
+        fontFamily: "monospace",
+      },
     });
     this.populationText.x = 10;
     this.populationText.y = 10;
@@ -89,10 +93,14 @@ export class World {
     this.graph.y = 40; // position below text
     stage.addChild(this.graph);
 
-    const foodIntervalSlider = document.getElementById('foodInterval') as HTMLInputElement;
-    const foodIntervalValue = document.getElementById('foodIntervalValue') as HTMLSpanElement;
+    const foodIntervalSlider = document.getElementById(
+      "foodInterval",
+    ) as HTMLInputElement;
+    const foodIntervalValue = document.getElementById(
+      "foodIntervalValue",
+    ) as HTMLSpanElement;
 
-    foodIntervalSlider.addEventListener('input', e => {
+    foodIntervalSlider.addEventListener("input", () => {
       this.foodSpawnInterval = parseFloat(foodIntervalSlider.value);
       foodIntervalValue.textContent = `${this.foodSpawnInterval.toFixed(2)}s`;
     });
@@ -168,31 +176,31 @@ export class World {
 
   _update_creatures(dt: number) {
     for (let i = this.creatures.length - 1; i >= 0; i--) {
-        const creature = this.creatures[i];
-        creature.update(dt, this.width, this.height, this.foods, this);
-        if (creature.dead) {
-            this.container.removeParticle(creature.sprite);
-            this.creatures.splice(i, 1);
-        } else {
-            this.insertToGrid(creature);
-        }
+      const creature = this.creatures[i];
+      creature.update(dt, this.width, this.height, this.foods, this);
+      if (creature.dead) {
+        this.container.removeParticle(creature.sprite);
+        this.creatures.splice(i, 1);
+      } else {
+        this.insertToGrid(creature);
+      }
     }
   }
 
   _spawn_food(dt: number) {
     this.foodSpawnTimer += dt;
     while (this.foodSpawnTimer >= this.foodSpawnInterval) {
-        this.foodSpawnTimer -= this.foodSpawnInterval;
+      this.foodSpawnTimer -= this.foodSpawnInterval;
 
-        // Spawn a new food at random position
-        if (this.foods.length < 5000) {
-            const f = new Food(
-                Math.random() * this.width,
-                Math.random() * this.height,
-                this.foodContainer
-            );
-            this.foods.push(f);
-        }
+      // Spawn a new food at random position
+      if (this.foods.length < 5000) {
+        const f = new Food(
+          Math.random() * this.width,
+          Math.random() * this.height,
+          this.foodContainer,
+        );
+        this.foods.push(f);
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
-import * as PIXI from 'pixi.js';
-import { Food } from './food';
-import { World } from './world';
+import * as PIXI from "pixi.js";
+import { Food } from "./food";
+import { World } from "./world";
 
 export class Creature {
   x: number;
@@ -17,14 +17,14 @@ export class Creature {
     this.y = y;
     this.vx = (Math.random() - 0.5) * 2;
     this.vy = (Math.random() - 0.5) * 2;
-    this.wanderAngle = (Math.random())
+    this.wanderAngle = Math.random();
 
     const gfx = PIXI.Texture.WHITE;
     this.sprite = new PIXI.Particle(gfx);
     this.sprite.scaleX = 3;
     this.sprite.scaleY = 3;
     // this.sprite.tint = 0x00ff80 + Math.floor(Math.random() * 0x0040);
-    this.sprite.tint = 0xFF4B00
+    this.sprite.tint = 0xff4b00;
     this.sprite.anchorX = 0.5;
     this.sprite.anchorY = 0.5;
     this.sprite.x = x;
@@ -32,9 +32,15 @@ export class Creature {
     container.addParticle(this.sprite);
   }
 
-  update(dt: number, width: number, height: number, food: Food[], world: World) {
+  update(
+    dt: number,
+    width: number,
+    height: number,
+    food: Food[],
+    world: World,
+  ) {
     const visionRadius = 100; // pixels
-    const wanderSpeed = 20;   // slower than food speed
+    const wanderSpeed = 20; // slower than food speed
 
     // --- Find nearest food within visionRadius ---
     let closest: Food | null = null;
@@ -43,7 +49,7 @@ export class Creature {
     for (const f of food) {
       const dx = f.x - this.x;
       const dy = f.y - this.y;
-      const distSq = dx*dx + dy*dy;
+      const distSq = dx * dx + dy * dy;
       if (distSq < minDistSq) {
         minDistSq = distSq;
         closest = f;
@@ -55,7 +61,7 @@ export class Creature {
       // Move towards food
       const dx = closest.x - this.x;
       const dy = closest.y - this.y;
-      const len = Math.sqrt(dx*dx + dy*dy);
+      const len = Math.sqrt(dx * dx + dy * dy);
       const speed = 50; // pixels per second
 
       this.vx = (dx / len) * speed;
@@ -63,8 +69,8 @@ export class Creature {
 
       // Eat if close
       if (len < 5) {
-        this.energy += 50;          
-        closest.consume();          // remove food sprite
+        this.energy += 50;
+        closest.consume(); // remove food sprite
         food.splice(food.indexOf(closest), 1);
       }
     } else {
@@ -86,7 +92,7 @@ export class Creature {
       const child = new Creature(
         this.x + Math.cos(offsetAngle) * 5,
         this.y + Math.sin(offsetAngle) * 5,
-        world.container
+        world.container,
       );
       child.energy = this.energy;
       child.wanderAngle = offsetAngle; // give child a wander direction
@@ -113,10 +119,22 @@ export class Creature {
     this.y += this.vy * dt;
 
     // --- Bounce walls ---
-    if (this.x < 0) { this.x = 0; this.vx *= -1; }
-    if (this.x > width) { this.x = width; this.vx *= -1; }
-    if (this.y < 0) { this.y = 0; this.vy *= -1; }
-    if (this.y > height) { this.y = height; this.vy *= -1; }
+    if (this.x < 0) {
+      this.x = 0;
+      this.vx *= -1;
+    }
+    if (this.x > width) {
+      this.x = width;
+      this.vx *= -1;
+    }
+    if (this.y < 0) {
+      this.y = 0;
+      this.vy *= -1;
+    }
+    if (this.y > height) {
+      this.y = height;
+      this.vy *= -1;
+    }
 
     // --- Energy drain & death ---
     this.energy -= dt * 5;

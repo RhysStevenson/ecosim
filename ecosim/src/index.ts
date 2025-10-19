@@ -1,6 +1,6 @@
 import { Application } from "pixi.js";
-import { World } from './world.ts';
-import { SimulationController } from './simulationController';
+import { World } from "./world.ts";
+import { SimulationController } from "./simulationController";
 
 const app = new Application();
 await app.init({
@@ -21,25 +21,25 @@ const world = new World(app.stage, app.screen.width, app.screen.height);
 
 // Main loop
 app.ticker.add((ticker) => {
-    if (!controller.isRunning()) return;
+  if (!controller.isRunning()) return;
 
-    const delta = ticker.deltaTime;
-    const dt = delta / 30;
+  const delta = ticker.deltaTime;
+  const dt = delta / 30;
 
-    simulationTime = dt * controller.getSpeed();
+  simulationTime = dt * controller.getSpeed();
 
-    world.update(simulationTime);
+  world.update(simulationTime);
 });
 
-const playPauseBtn = document.getElementById('playPause') as HTMLButtonElement;
-const speedSelect = document.getElementById('speed') as HTMLSelectElement;
+const playPauseBtn = document.getElementById("playPause") as HTMLButtonElement;
+const speedSelect = document.getElementById("speed") as HTMLSelectElement;
 
-playPauseBtn.addEventListener('click', () => {
+playPauseBtn.addEventListener("click", () => {
   controller.togglePause();
-  playPauseBtn.textContent = controller.isRunning() ? '⏸ Pause' : '▶️ Play';
+  playPauseBtn.textContent = controller.isRunning() ? "⏸ Pause" : "▶️ Play";
 });
 
-speedSelect.addEventListener('change', e => {
+speedSelect.addEventListener("change", (e) => {
   const newSpeed = parseFloat((e.target as HTMLSelectElement).value);
   controller.setSpeed(newSpeed);
 });

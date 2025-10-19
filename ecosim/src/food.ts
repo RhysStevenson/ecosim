@@ -1,15 +1,15 @@
-import * as PIXI from 'pixi.js';
+import * as PIXI from "pixi.js";
 
 export class Food {
   x: number;
   y: number;
   sprite: PIXI.Particle;
-  container: PIXI.ParticleContainer
+  container: PIXI.ParticleContainer;
 
   constructor(x: number, y: number, container: PIXI.ParticleContainer) {
     this.x = x;
     this.y = y;
-    this.container = container
+    this.container = container;
 
     const texture = PIXI.Texture.WHITE; // simple square
     this.sprite = new PIXI.Particle(texture);
@@ -26,6 +26,6 @@ export class Food {
   }
 
   consume() {
-    this.container.removeParticle(this.sprite)
+    this.container.removeParticle(this.sprite);
   }
 }

@@ -47,7 +47,7 @@ export class World {
     stage.addChild(this.container);
 
     // spawn some creatures
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 50; i++) {
       const c = new Creature(
         Math.random() * width,
         Math.random() * height,
@@ -88,6 +88,14 @@ export class World {
     this.graph = new PIXI.Graphics();
     this.graph.y = 40; // position below text
     stage.addChild(this.graph);
+
+    const foodIntervalSlider = document.getElementById('foodInterval') as HTMLInputElement;
+    const foodIntervalValue = document.getElementById('foodIntervalValue') as HTMLSpanElement;
+
+    foodIntervalSlider.addEventListener('input', e => {
+      this.foodSpawnInterval = parseFloat(foodIntervalSlider.value);
+      foodIntervalValue.textContent = `${this.foodSpawnInterval.toFixed(2)}s`;
+    });
   }
 
   clearGrid() {
@@ -108,7 +116,6 @@ export class World {
 
   update(dt: number) {
     this.clearGrid();
-    console.log(this.creatures.length)
     this._update_creatures(dt);
 
     this._spawn_food(dt);

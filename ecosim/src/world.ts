@@ -21,6 +21,10 @@ export class World {
   foodSpawnTimer: number = 0; // seconds accumulator
   foodSpawnInterval: number = 0.1; // spawn every 1 second (adjustable)
   effects: Effect[] = [];
+  populationText: PIXI.Text;
+  populationHistory: number[] = [];
+  historyLength = 3000; // number of frames to keep (e.g. ~5 seconds at 60fps)
+  graph: PIXI.Graphics;
 
   constructor(stage: PIXI.Container, width: number, height: number) {
     this.width = width;
@@ -43,7 +47,7 @@ export class World {
     stage.addChild(this.container);
 
     // spawn some creatures
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 5; i++) {
       const c = new Creature(
         Math.random() * width,
         Math.random() * height,
@@ -69,6 +73,21 @@ export class World {
         this.foods.push(f);
     }
 
+    this.populationText = new PIXI.Text({
+        text: "Population: 0",
+        style: {
+            fill: 0xffffff,
+            fontSize: 14,
+            fontFamily: "monospace",
+        },
+    });
+    this.populationText.x = 10;
+    this.populationText.y = 10;
+    stage.addChild(this.populationText);
+
+    this.graph = new PIXI.Graphics();
+    this.graph.y = 40; // position below text
+    stage.addChild(this.graph);
   }
 
   clearGrid() {
@@ -96,15 +115,48 @@ export class World {
 
     // Update temporary pink pops
     if (this.effects) {
-    for (let i = this.effects.length - 1; i >= 0; i--) {
+      for (let i = this.effects.length - 1; i >= 0; i--) {
         const e = this.effects[i];
         e.lifetime -= dt;
         e.sprite.alpha = Math.max(e.lifetime / 0.3, 0);
         if (e.lifetime <= 0) {
-        this.effects.splice(i, 1);
+          this.effects.splice(i, 1);
         }
+      }
     }
+
+    this.populationText.text = `Creatures: ${this.creatures.length} | Food: ${this.foods.length}`;
+
+    // Record population history
+    this.populationHistory.push(this.creatures.length);
+    if (this.populationHistory.length > this.historyLength) {
+      this.populationHistory.shift();
     }
+
+    // --- Draw population graph ---
+    const g = this.graph;
+    g.clear();
+
+    const graphWidth = 200;
+    const graphHeight = 50;
+    const x = 10;
+    const y = 0;
+
+    g.rect(x, y, graphWidth, graphHeight).fill({ color: 0x000000, alpha: 0.5 }); // background box
+
+    // Compute scaling
+    const maxPop = Math.max(...this.populationHistory, 10);
+    const scaleX = graphWidth / this.historyLength;
+    const scaleY = graphHeight / maxPop;
+
+    // Draw line
+    g.moveTo(x, y + graphHeight - this.populationHistory[0] * scaleY);
+    for (let i = 1; i < this.populationHistory.length; i++) {
+      const px = x + i * scaleX;
+      const py = y + graphHeight - this.populationHistory[i] * scaleY;
+      g.lineTo(px, py);
+    }
+    g.stroke({ color: 0x00ff00, width: 1 }); // bright green line
   }
 
   _update_creatures(dt: number) {
